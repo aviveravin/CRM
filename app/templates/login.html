@@ -5,7 +5,7 @@
 <div class="col-lg-5 shadow mx-auto">
   <div class="alert alert-success">Login</div>
   <div class="p-4">
-      <form action="/login/" method="post">
+      <form action="/login/" method="POST">
           {% csrf_token %}  
           <table>  
              {{ form.as_table }}  

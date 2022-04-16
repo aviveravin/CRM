@@ -1,12 +1,14 @@
+import email
 from multiprocessing import context
+from django.forms import PasswordInput
 from django.shortcuts import render , redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate , login as loginUser , logout
-from django.contrib.auth.forms import UserCreationForm , AuthenticationForm
-
-from app.forms import CRMForm
+from app.forms import CRMForm , AuthenticationForm , RegistrationForm
 from app.models import CRM
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 @login_required(login_url='login')
 def home(request):
@@ -23,41 +25,40 @@ def login(request):
         return render(request , 'login.html' , context=context)
     else:
         form = AuthenticationForm(data = request.POST)
-        print(form.is_valid())
-        print(request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username = username , password = password)
+            email = request.POST['email']
+            password = request.POST['password']
+            user = authenticate(email=email, password=password)
             if user is not None:
-                loginUser(request , user)
-                return redirect('home')
+                if user.is_active:
+                    loginUser(request,user)
+                    return redirect('home')
         else:
             context = {
-            "form" : form
-            }
+                "form" : form
+                }
             return render(request , 'login.html' , context=context)
+
+
 
 def signup(request):
     if request.method == 'GET':
-        form = UserCreationForm()
+        form = RegistrationForm()
         context = {
             "form" : form
         }
         return render(request , 'signup.html' , context=context)
     else:
-        form = UserCreationForm(request.POST)
-        context = {
-            "form" : form
-        }
+        form = RegistrationForm(data = request.POST)
         if form.is_valid():
             user = form.save()
-            print(user)
+            user = authenticate(email = email, password = PasswordInput)
             if user is not None:
-                return redirect('login')    
+                return redirect('login')
         else:
-            return render(request , 'signup.html' , context=context)
-    
+            form = RegistrationForm()
+
+        return render(request,'signup.html',{'form':form,})
 
 @login_required(login_url='login')
 def add_job(request):
