@@ -52,7 +52,7 @@ def signup(request):
         form = RegistrationForm(data = request.POST)
         if form.is_valid():
             user = form.save()
-            user = authenticate()
+            print(user)
             if user is not None:
                 return redirect('login')
         else:
