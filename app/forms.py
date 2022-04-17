@@ -17,7 +17,7 @@ class RegistrationForm(ModelForm):
         attrs={'class':'form-control','type':'password', 'name': 'password'}),
         label="Password (again)")
 
-    '''added attributes so as to customise for styling, like bootstrap'''
+
     class Meta:
         model = User
         fields = ['email','password1','password2']

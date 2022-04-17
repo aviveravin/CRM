@@ -1,4 +1,4 @@
-import email
+
 from multiprocessing import context
 from django.forms import PasswordInput
 from django.shortcuts import render , redirect
@@ -26,14 +26,14 @@ def login(request):
     else:
         form = AuthenticationForm(data = request.POST)
         if form.is_valid():
-            email = request.POST['email']
-            password = request.POST['password']
-            user = authenticate(email=email, password=password)
+            email = form.cleaned_data.get('email')
+            password = form.cleaned_data.get('password')
+            user = authenticate(email = email , password = password)
             if user is not None:
-                if user.is_active:
-                    loginUser(request,user)
-                    return redirect('home')
+                loginUser(request,user)
+                return redirect('home')
         else:
+            form = AuthenticationForm()
             context = {
                 "form" : form
                 }
@@ -52,7 +52,7 @@ def signup(request):
         form = RegistrationForm(data = request.POST)
         if form.is_valid():
             user = form.save()
-            user = authenticate(email = email, password = PasswordInput)
+            user = authenticate()
             if user is not None:
                 return redirect('login')
         else:
